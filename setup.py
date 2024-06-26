@@ -9,11 +9,11 @@ from setuptools import setup, find_packages
 
 setup(
     name="jito_py",
-    version="0.1.0",
+    version="0.1.2",
     description="A Python library for interacting with the Jito JSON-RPC",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/jito-py",
+    url="https://github.com/MatrixYe/jito-py",
     author="Matrix.Ye",
     author_email="initsysctrl@outlook.com",
     license="MIT",
