@@ -11,7 +11,7 @@ upload:
 
 ## local test
 dev:
-	pip install dist/jito_py-0.1.2-py3-none-any.whl
+	pip install dist/jito_py-0.1.3-py3-none-any.whl
 ## Show help
 help:
 	@echo ''
