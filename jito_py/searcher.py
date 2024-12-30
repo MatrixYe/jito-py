@@ -39,7 +39,8 @@ class Searcher:
             "params": params or []
         }
         try:
-            url = f"{self.block_engine_url}/{endpoint}"
+            # url = f"{self.block_engine_url}/{endpoint}"
+            url = f"{self.block_engine_url.rstrip('/')}/{endpoint.lstrip('/')}"
             response = requests.post(url=url, json=payload, headers=headers)
             response.raise_for_status()
             return response.json()
