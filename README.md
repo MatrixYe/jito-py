@@ -41,6 +41,12 @@ searcher = Searcher(block_engine_url)
 tip_accounts = searcher.get_tip_accounts()
 print("Tip Accounts:", tip_accounts)
 
+# Get what tip amount to use
+# Directly access which Percentile Jito Fee to use for your transaction in lamports
+tip_floors = searcher.get_tip_floors()
+print(f"Avg Jito Tip in Lamports for Top 99 Percentile Landed Txns: "
+      f"{tip_floors.landed_tips_lamports_99th_percentile}")
+
 # Get bundle statuses  
 bundle_ids = ["your_bundle_id_here"]
 bundle_statuses = searcher.get_bundle_statuses(bundle_ids)
@@ -59,4 +65,4 @@ print("Sent Transaction ID:", transaction_id)
 
 ## License
 
-This project is licensed under the MIT License. See the[LICENSE](LICENSE)file for more details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
