@@ -1,7 +1,9 @@
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from typing import List, Optional, Dict, Any
-
 import requests
+
+JITO_TIPS_ENDPOINT: str = "https://bundles.jito.wtf"
 
 
 @dataclass
@@ -17,6 +19,38 @@ class BundleStatus:
 class BundleStatusesResponse:
     context_slot: int
     statuses: List[BundleStatus] = field(default_factory=list)
+
+
+@dataclass
+class BundlesTipsFloorResponse:
+    time: datetime
+    landed_tips_lamports_25th_percentile: int
+    landed_tips_lamports_50th_percentile: int
+    landed_tips_lamports_75th_percentile: int
+    landed_tips_lamports_95th_percentile: int
+    landed_tips_lamports_99th_percentile: int
+    ema_landed_tips_lamports_50th_percentile: int
+
+    @staticmethod
+    def from_dict(data: Dict[str, Any]) -> "BundlesTipsFloorResponse":
+        """
+        Parses a dictionary into a BundlesTipsFloorResponse object, converting the
+        time string into a datetime object in UTC.
+        """
+        # Parse the ISO8601 time string (e.g., "2025-03-12T15:38:27Z") to a datetime object in UTC
+
+        time_str = data.get("time")
+        parsed_time = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+
+        return BundlesTipsFloorResponse(
+            time=parsed_time,
+            landed_tips_lamports_25th_percentile=int(float(data.get("landed_tips_25th_percentile")) * (10 ** 9)),
+            landed_tips_lamports_50th_percentile=int(float(data.get("landed_tips_50th_percentile")) * (10 ** 9)),
+            landed_tips_lamports_75th_percentile=int(float(data.get("landed_tips_75th_percentile")) * (10 ** 9)),
+            landed_tips_lamports_95th_percentile=int(float(data.get("landed_tips_95th_percentile")) * (10 ** 9)),
+            landed_tips_lamports_99th_percentile=int(float(data.get("landed_tips_99th_percentile")) * (10 ** 9)),
+            ema_landed_tips_lamports_50th_percentile=int(float(data.get("ema_landed_tips_50th_percentile")) * (10 ** 9))
+        )
 
 
 class Searcher:
@@ -79,6 +113,33 @@ class Searcher:
         """
         response = self._send_rpc_request("/api/v1/bundles", "getTipAccounts")
         return self._extract_result(response, "getTipAccounts")
+
+    def get_tip_floors(self) -> BundlesTipsFloorResponse:
+        """
+        Retrieves the tips floor data for landed transactions. This data reflects the average SOL tip amounts
+        based on various percentiles, which can be useful for understanding tip distributions for bundles and
+        determining the optimal tip amount to land your transaction on Jito.
+
+        The API response is expected to be a list of dictionaries with the following keys:
+            - time
+            - landed_tips_25th_percentile
+            - landed_tips_50th_percentile
+            - landed_tips_75th_percentile
+            - landed_tips_95th_percentile
+            - landed_tips_99th_percentile
+            - ema_landed_tips_50th_percentile
+
+        :return: A BundlesTipsFloorResponse object parsed from the API response.
+        :raises Exception: If the API request fails or the response is invalid.
+        """
+        response = requests.get(f"{JITO_TIPS_ENDPOINT}/api/v1/bundles/tip_floor")
+        response.raise_for_status()  # Raises an HTTPError for bad responses.
+        data = response.json()
+        if not data:
+            raise Exception("No tip floor data available")
+
+        # Extract the first dictionary from the list and parse it.
+        return BundlesTipsFloorResponse.from_dict(data[0])
 
     def send_bundle(self, transactions: List[str]) -> str:
         """

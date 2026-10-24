@@ -27,8 +27,12 @@ class BlockEngine:
             "block_engine_url": "https://tokyo.mainnet.block-engine.jito.wtf",
             "shred_receiver_addr": "202.8.9.160:1002",
             "relayer_url": "http://tokyo.mainnet.relayer.jito.wtf:8100",
-        }
-
+        },
+        "Utah": {
+            "block_engine_url": "https://slc.mainnet.block-engine.jito.wtf",
+            "shred_receiver_addr": "64.130.53.8:1002",
+            "relayer_url": "http://slc.mainnet.relayer.jito.wtf:8100",
+        },
     }
     TESTNET_ADDRESS = {
         "Dallas": {
